@@ -31,6 +31,7 @@ class OP_Transfer{
         add_action( 'wp_ajax_op_update_transfer_send', array($this,'send_transfer') );
         add_action( 'wp_ajax_op_update_transfer_receive', array($this,'receive_transfer') );
         add_action( 'wp_ajax_op_print_transfer', array($this,'print_transfer') );
+        add_action( 'wp_ajax_op_scan_barcode', array($this,'scan_barcode') );
 
 
 
@@ -554,6 +555,56 @@ class OP_Transfer{
         $url = admin_url('admin-ajax.php?action=op_force_download_book_csv&file='.$file_name);
         $result['data']['export_file'] = $url;
         $result['status'] = 1;
+        echo json_encode($result);
+        exit;
+    }
+    public function scan_barcode(){
+        global $OPENPOS_CORE;
+        $result = array(
+            'status' => 0,
+            'data' => array(),
+            'message' => 'Unknown message'
+        );
+        try{
+            $barcode = sanitize_text_field($_REQUEST['barcode']);
+            $from_warehouse_id = intval($_REQUEST['from_warehouse_id']);
+            $transfer_id = intval($_REQUEST['transfer_id']);
+
+
+            $product_id = $OPENPOS_CORE->getProductIdByBarcode($barcode);
+            if(!$product_id)
+            {
+                throw new Exception(__('No product with barcode "'.sanitize_text_field($barcode).'"','openpos'));
+            }
+            if(!$transfer_id)
+            {
+                $transfer_id = $this->db->save_draft_transfer($from_warehouse_id);
+
+            }
+            $qty = 1;
+            $product = wc_get_product($product_id);
+            $row = $this->db->getRowByProductId($transfer_id,$product_id);
+            if($row)
+            {
+                $qty += 1 * $row['product_qty'];
+            }
+            $data = array(
+                'transfer_id' => $transfer_id,
+                'product_id' => $product_id,
+                'product_qty' => $qty,
+                'product_barcode' => $OPENPOS_CORE->getBarcode($product_id),
+                'product_sku' => $product->get_sku(),
+
+            );
+            $this->db->save_transfer_items($data);
+
+            $result['data']['transfer_id'] = $transfer_id;
+            $result['status'] = 1;
+        }catch (Exception $e)
+        {
+            $result['status'] = 0;
+            $result['message'] = $e->getMessage();
+        }
         echo json_encode($result);
         exit;
     }

@@ -52,13 +52,16 @@ if(!class_exists('OP_Transfer_Db'))
                 $wpdb->prefix . "openpos_stock_transfers",
                 array(
                     'title' => 'temp',
-                    'from_warehouse_id' => $from_warehouse_id
+                    'from_warehouse_id' => $from_warehouse_id,
+                    'transfer_date' => date('Y-m-d H:i:s' ),
+                    'transfer_date_gmt' => gmdate('Y-m-d H:i:s' )
                 )
             );
             return $wpdb->insert_id;
 
         }
         public function save_transfer($data){
+
             global $wpdb;
             if(isset($data['transfer_id']) && $data['transfer_id'] > 0 )
             {
@@ -88,6 +91,8 @@ if(!class_exists('OP_Transfer_Db'))
                         'created_by' => $data['created_by'],
                         'transfer_status' => (int)$data['status'],
                         'note' => esc_textarea($data['note']),
+                        'transfer_date' => date('Y-m-d H:i:s' ),
+                        'transfer_date_gmt' => gmdate('Y-m-d H:i:s' )
                     )
                 );
                 return $wpdb->insert_id;
@@ -147,7 +152,9 @@ if(!class_exists('OP_Transfer_Db'))
                 $wpdb->prefix . "openpos_stock_transfers",
                 array(
                     'transfer_status' => 4,
-                    'received_by' => $current_user_id
+                    'received_by' => $current_user_id,
+                    'received_date' => date('Y-m-d H:i:s' ),
+                    'received_date_gmt' => gmdate('Y-m-d H:i:s' )
                 ),
                 array( 'transfer_id' => (int)$transfer_id )
             );
@@ -159,7 +166,9 @@ if(!class_exists('OP_Transfer_Db'))
                 $wpdb->prefix . "openpos_stock_transfers",
                 array(
                     'transfer_status' => 3,
-                    'received_by' => $current_user_id
+                    'received_by' => $current_user_id,
+                    'received_date' => date('Y-m-d H:i:s' ),
+                    'received_date_gmt' => gmdate('Y-m-d H:i:s' )
                 ),
                 array( 'transfer_id' => (int)$transfer_id )
             );
@@ -208,6 +217,17 @@ if(!class_exists('OP_Transfer_Db'))
             $total = $wpdb->get_var($sql_count);
             $rows = $wpdb->get_results( $sql,ARRAY_A );
             return array('total' => $total,'rows' => $rows);
+        }
+
+        public function getRowByProductId($transfer_id,$product_id){
+            global $wpdb;
+            $sql = "SELECT * FROM ".$wpdb->prefix."openpos_stock_transfer_products WHERE transfer_id = ".(int)$transfer_id." AND product_id = ".$product_id;
+            $row = $wpdb->get_row($sql,ARRAY_A);
+            if(empty($row))
+            {
+                return false;
+            }
+            return $row;
         }
 
         public function getTransfer($transfer_id){

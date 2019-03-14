@@ -1,4 +1,9 @@
 <div class="wrap op-conten-wrap">
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-danger pull-left" href="<?php echo admin_url('admin.php?page=op-stock-transfer'); ?>" role="button" style="margin-right: 5px;"><?php echo __('Back','openpos'); ?></a>
+        </div>
+    </div>
     <h1><?php echo __( 'Edit Transfer', 'woo-book-price' ); ?></h1>
 
     <div class="form-container">
@@ -71,7 +76,23 @@
                 </form>
             </div>
         </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <form class="form-inline" id="barcode-scan-frm" >
+                    <div class="form-group">
 
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <?php echo __( 'Barcode', 'woo-book-price' ); ?>
+                            </div>
+                            <input type="text" class="form-control" id="barcodeScanInput" name="barcodeScanInput" placeholder="Enter barcode to add">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><?php echo __( 'Scan', 'woo-book-price' ); ?></button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <br class="clear">
@@ -292,6 +313,43 @@
                 }
             });
         });
+        $('#barcode-scan-frm').on('submit',function(e){
+            e.preventDefault();
+            var from_warehouse_id = $('select[name="from_warehouse_id"]').val();
+            var transfer_id = $('input[name="transfer_id"]').val();
+            var barcode = $('input[name="barcodeScanInput"]').val();
+            if(from_warehouse_id > -1 && barcode.length > 0)
+            {
+                $.ajax({
+                    url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+                    type: 'post',
+                    data: {action: 'op_scan_barcode',transfer_id: transfer_id,from_warehouse_id: from_warehouse_id, barcode: barcode },
+                    dataType: 'json',
+                    beforeSend:function(){
 
+                    },
+                    success: function(response){
+                        $('input[name="barcodeScanInput"]').select();
+                        if(response.status == 1)
+                        {
+
+                            table.ajax.url("<?php echo admin_url( 'admin-ajax.php?transfer_id=' ); ?>"+transfer_id).load();
+                            console.log(response);
+                        }else {
+                            alert(response.message);
+                        }
+                    }
+                });
+            }else {
+                if(from_warehouse_id > -1)
+                {
+                    alert("<?php echo __( 'Please enter barcode', 'woo-book-price' ); ?>");
+                }else {
+                    alert("<?php echo __( 'Please choose from Outlet', 'woo-book-price' ); ?>");
+                }
+
+            }
+
+        })
     })( jQuery );
 </script>

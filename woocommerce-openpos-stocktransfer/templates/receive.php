@@ -1,4 +1,9 @@
 <div class="wrap op-conten-wrap">
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-danger pull-left" href="<?php echo admin_url('admin.php?page=op-stock-transfer'); ?>" role="button" style="margin-right: 5px;"><?php echo __('Back','openpos'); ?></a>
+        </div>
+    </div>
     <h1><?php echo __( 'Receive Transfer', 'woo-book-price' ); ?></h1>
 
     <div class="form-container">
