@@ -76,6 +76,8 @@ if(!class_exists('OP_Transfer_Db'))
                         'created_by' => $data['created_by'],
                         'transfer_status' => (int)$data['status'],
                         'note' => esc_textarea($data['note']),
+                        'transfer_date' => date('Y-m-d H:i:s' ),
+                        'transfer_date_gmt' => gmdate('Y-m-d H:i:s' )
                     )
                 );
                 return $data['transfer_id'];

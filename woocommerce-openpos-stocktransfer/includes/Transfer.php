@@ -442,8 +442,11 @@ class OP_Transfer{
                                     {
                                         continue;
                                     }
-                                    $qty = $row[$qty_index];
-
+                                    $qty = 1 * $row[$qty_index];
+                                    if($qty <= 0 )
+                                    {
+                                        continue;
+                                    }
                                     $id = $product->get_id();
 
                                     $row_data = array(
