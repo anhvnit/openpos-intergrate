@@ -555,7 +555,7 @@ class OP_Transfer{
 
         $file_name = 'openpos-transfer-products-'.time().'.csv';
         $writer->save(ABSPATH.'wp-content/uploads/'.$file_name);
-        $url = admin_url('admin-ajax.php?action=op_force_download_book_csv&file='.$file_name);
+        $url = admin_url('admin-ajax.php?action=op_force_download_product_csv&file='.$file_name);
         $result['data']['export_file'] = $url;
         $result['status'] = 1;
         echo json_encode($result);
