@@ -1,4 +1,4 @@
-Integrate plugin to make Woocmmerce Point and Reward use with Openpos
+Integrate plugin to make Woocmmerce Point and Reward(https://woocommerce.com/products/woocommerce-points-and-rewards/) use with Openpos
 
 Functions:
 - allow customer use their point to checkout in Openpos
