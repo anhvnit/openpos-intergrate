@@ -60,6 +60,8 @@ function WooRolePricing_op_woocommerce_get_price ( $price, $product ) {
                 $result = $commission;
             }
         }
+    }else{
+        return 0;
     }
     return $result;
 }
@@ -68,6 +70,8 @@ if(!function_exists('WooRolePricing_op_customer_data'))
 {
     function WooRolePricing_op_customer_data($customer_data){
         global $current_user;
+        global $op_woo;
+
         $customer_id = $customer_data['id'];
         wp_set_current_user( $customer_id );
 
@@ -100,11 +104,52 @@ if(!function_exists('WooRolePricing_op_customer_data'))
                     {
                         $item_id = $item_ids[$key];
                         $product = wc_get_product($product_id);
-                        $discounts[''.$item_id] = array(
+                        $final_price = WooRolePricing_op_woocommerce_get_price($product_prices[$key],$product);
+                        if($final_price == 0)
+                        {
+                            continue;
+                        }
+                        $tax_amount = 0;
+
+                        if(wc_tax_enabled() )
+                        {
+                            $price_included_tax = wc_prices_include_tax();
+                            if($price_included_tax)
+                            {
+                                $tax_rates = $op_woo->getTaxRates( $product->get_tax_class() );
+
+                                if(!empty($tax_rates))
+                                {
+                                    $keys = array_keys($tax_rates);
+                                    $rate_id = max($keys);
+                                    $rate = $tax_rates[$rate_id];
+
+                                    $tax_amount = array_sum(@WC_Tax::calc_tax( $final_price, array($rate_id => $rate), wc_prices_include_tax() ));
+                                    $tax_amount = wc_round_tax_total($tax_amount);
+
+                                }
+
+                                $final_price -= $tax_amount;
+
+
+
+                            }
+
+                        }
+
+
+                        $tmp_item = array(
                             'item_id' => $item_id,
                             'product_id' => $product_id,
-                            'final_price' => WooRolePricing_op_woocommerce_get_price($product_prices[$key],$product),
+                            'final_price' => $final_price
                         );
+
+
+                        if($tax_amount > 0)
+                        {
+                            $tmp_item['tax_amount'] = $tax_amount;
+                        }
+                        $discounts[''.$item_id] = $tmp_item;
                     }
         }
 
