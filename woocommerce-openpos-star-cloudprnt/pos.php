@@ -4,6 +4,7 @@ require_once ($base_dir.'/wp-load.php');
 $result = array('message' => '','status' => 0);
 $receipt_html = isset($_REQUEST['html_str']) ? $_REQUEST['html_str'] : '';
 $cashdrawer_id = isset($_REQUEST['cashdrawer_id']) ? $_REQUEST['cashdrawer_id'] : 0;
+$copy = isset($_REQUEST['copy']) ? $_REQUEST['copy'] : 1;
 global $_op_printer;
 $setting = $_op_printer->get_setting();
 $mac = $setting['default_printer'];
@@ -32,7 +33,7 @@ if(isset($setting['active']) && $setting['active'] && $mac)
                     $image_base64 = file_get_contents($file["tmp_name"]);
 
                     if (file_put_contents($target_file,$image_base64)) {
-                        star_cloudprnt_queue_add_print_job($mac,$target_file,1);
+                        star_cloudprnt_queue_add_print_job($mac,$target_file,$copy);
 
                         $result['message'] =  "The file ". basename( $file["name"]). " has been uploaded.";
                         $result['status'] = 1;

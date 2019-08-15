@@ -5,7 +5,7 @@ Plugin URI: http://openswatch.com
 Description: Star CloudPRNT for OpenPOS
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.0
+Version: 1.2
 WC requires at least: 2.6
 Text Domain: openpos-star-cloudprnt
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
