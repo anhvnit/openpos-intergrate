@@ -2,22 +2,21 @@
 /*
 Plugin Name: Woocommerce OpenPos + WooCommerce TM Extra Product Options
 Plugin URI: http://openswatch.com
-Description: Woocommerce OpenPos + WooCommerce TM Extra Product Options (4.9.9) For select , text, radio, checkbox type
+Description: Woocommerce OpenPos + WooCommerce TM Extra Product Options For select , text, radio, checkbox type
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 2.0
+Version: 1.0
 WC requires at least: 2.6
 Text Domain: openpos-tm-addon
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 
-if(true)
+if(function_exists('EPO'))
 {
-    
     function tm_wc_product_addons($response_data,$_product){
         $product_id = $_product->ID;
         $product = wc_get_product($_product->ID);
-        $epos    = THEMECOMPLETE_EPO()->get_product_tm_epos( $product_id );
+        $epos    = TM_EPO()->get_product_tm_epos( $product_id );
         $tm_meta = array();
 		
 		if ( is_array( $epos ) && isset( $epos['global_ids'] ) && is_array( $epos['global_ids'] ) ) {
@@ -27,7 +26,7 @@ if(true)
 				$id   = $post->ID;
 				$type = $post->post_type;
 
-				$meta = themecomplete_get_post_meta( $id, 'tm_meta', TRUE );
+				$meta = tc_get_post_meta( $id, 'tm_meta', TRUE );
 
 				if ( ! empty( $meta )
 				     && is_array( $meta )
@@ -35,7 +34,7 @@ if(true)
 				     && is_array( $meta['tmfbuilder'] )
 				) {
 
-					$meta    = THEMECOMPLETE_EPO_HELPER()->recreate_element_ids( $meta );
+					$meta    = TM_EPO_HELPER()->recreate_element_ids( $meta );
 					$tm_meta = array_merge_recursive( $tm_meta, $meta );
 
 				}
