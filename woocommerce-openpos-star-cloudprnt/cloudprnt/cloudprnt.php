@@ -194,7 +194,11 @@
 				{
 					header('Content-Type: application/vnd.star.line');
 					echo file_get_contents($file);
-				}
+				}else if (strtolower($ext) == "html")
+                {
+                    header('Content-Type: text/html');
+                    echo file_get_contents($file);
+                }
 			}
 			exit;
 		}

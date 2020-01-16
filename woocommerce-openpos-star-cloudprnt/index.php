@@ -5,12 +5,12 @@ Plugin URI: http://openswatch.com
 Description: Star CloudPRNT for OpenPOS
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.2
+Version: 1.3
 WC requires at least: 2.6
 Text Domain: openpos-star-cloudprnt
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
-
+// pos_kitchen_cloud_print
 define('OPENPOS_CLOUDPRNT_DIR',plugin_dir_path(__FILE__));
 define('OPENPOS_CLOUDPRNT_URL',plugins_url('woocommerce-openpos-star-cloudprnt'));
 
@@ -33,7 +33,11 @@ if(!function_exists('custom_op_get_login_cashdrawer_data_cloud_print'))
         {
             $session_response_data['setting']['pos_cloud_print'] = array(
                 'url' =>  OPENPOS_CLOUDPRNT_URL.'/pos.php'
-            );
+            ); // comment this if turn off for cashier
+            $session_response_data['setting']['pos_kitchen_cloud_print'] = array(
+                'url' =>  OPENPOS_CLOUDPRNT_URL.'/pos.php'
+            ); // comment this if turn off for table / desk print
+            
         }
         return $session_response_data;
     }

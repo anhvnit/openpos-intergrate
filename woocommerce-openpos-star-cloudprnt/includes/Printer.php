@@ -119,16 +119,20 @@ class OP_Printer{
         if($id)
         {
             $printer = isset($params['_op_register_star_cloudprnt']) ? $params['_op_register_star_cloudprnt'] : '';
+            $printer_kitchen = isset($params['_op_register_star_cloudprnt_kitchen']) ? $params['_op_register_star_cloudprnt_kitchen'] : '';
             update_post_meta($id,'_op_register_star_cloudprnt',$printer);
+            update_post_meta($id,'_op_register_star_cloudprnt_kitchen',$printer_kitchen);
         }
     }
     public function op_register_form_end($default,$warehouses,$cashiers){
         $printers = $this->getPrinters();
         $current_printer = '';
+        $current_printer_kitchen = '';
 
         if($default['id'] > 0)
         {
             $current_printer = get_post_meta($default['id'],'_op_register_star_cloudprnt',true);
+            $current_printer_kitchen = get_post_meta($default['id'],'_op_register_star_cloudprnt_kitchen',true);
         }
         ?>
         <div class="form-group">
@@ -140,6 +144,19 @@ class OP_Printer{
                         <option value="<?php echo $key; ?>"  <?php echo $current_printer == $key ? 'selected': ''; ?>><?php echo $printer['name']; ?><?php echo isset($printer['ClientType']) ? ' - '.$printer['ClientType'] : ''; ?></option>
                     <?php endforeach; ?>
                 </select>
+                <p class="help-block"><?php echo __( 'Star PRNT Printer for master receipt', 'openpos' ); ?></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><?php echo __( 'Printer', 'openpos' ); ?></label>
+            <div class="col-sm-10">
+                <select class="form-control" name="_op_register_star_cloudprnt_kitchen">
+                    <option  value=""><?php echo __('Use Default Printer','openpos'); ?></option>
+                    <?php foreach($printers as $key => $printer):  ?>
+                        <option value="<?php echo $key; ?>"  <?php echo $current_printer == $key ? 'selected': ''; ?>><?php echo $printer['name']; ?><?php echo isset($printer['ClientType']) ? ' - '.$printer['ClientType'] : ''; ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="help-block"><?php echo __( 'Star PRNT Printer for kitchen receipt', 'openpos' ); ?></p>
             </div>
         </div>
         <?php
