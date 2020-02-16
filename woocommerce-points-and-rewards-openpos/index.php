@@ -5,7 +5,7 @@ Plugin URI: http://openswatch.com
 Description: WooCommerce Points and Rewards For OpenPOS
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.0
+Version: 1.1
 WC requires at least: 2.6
 Text Domain: openpos-dev
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -66,6 +66,7 @@ if(!function_exists('op_wc_points_rewards_add_order_before'))
             $order_id = $order->get_id();
             $order_user_id = version_compare( WC_VERSION, '3.0', '<' ) ? $order->user_id : $order->get_user_id();
             update_post_meta( $order->get_id(), '_wc_points_logged_redemption', array( 'points' => $point_discount['point'], 'amount' => $discount_amount, 'discount_code' => '' ) );
+            update_post_meta( $order->get_id(), '_openpos_wc_points_logged_redemption', array( 'points' => $point_discount['point'], 'amount' => $discount_amount, 'discount_code' => '' ) );
             WC_Points_Rewards_Manager::decrease_points( $order_user_id, $point_discount['point'], 'order-redeem', array( 'discount_code' => '', 'discount_amount' => $discount_amount ), $order_id );
             update_post_meta( $order_id, '_wc_points_redeemed', $point_discount['point'] );
         }
@@ -73,3 +74,16 @@ if(!function_exists('op_wc_points_rewards_add_order_before'))
     }
 }
 add_action('op_add_order_before', 'op_wc_points_rewards_add_order_before',10,2);
+
+function op_wc_points_rewards_points_earned_for_purchase($points_earned, $order){
+    $redeemed =  get_post_meta( $order->get_id(), '_openpos_wc_points_logged_redemption',true);
+    $is_redeemed =  get_post_meta( $order->get_id(), '_op_wc_points_redeemed',true);
+    if($redeemed && isset($redeemed['amount']) && !$is_redeemed)
+    {
+        $points_earned += WC_Points_Rewards_Manager::calculate_points( $redeemed['amount'] );
+        update_post_meta( $order->get_id(), '_op_wc_points_redeemed',1 );
+    }
+
+    return $points_earned;
+}
+add_action('wc_points_rewards_points_earned_for_purchase', 'op_wc_points_rewards_points_earned_for_purchase',10,2);
