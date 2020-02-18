@@ -5,7 +5,7 @@ Plugin URI: http://openswatch.com
 Description: WooCommerce Points and Rewards For OpenPOS
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.2
+Version: 1.3
 WC requires at least: 2.6
 Text Domain: openpos-dev
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -76,22 +76,17 @@ if(!function_exists('op_wc_points_rewards_add_order_before'))
 add_action('op_add_order_before', 'op_wc_points_rewards_add_order_before',10,2);
 
 function op_wc_points_rewards_points_earned_for_purchase($points_earned, $order){
-    if($order)
+    global $op_session_data;
+    if($op_session_data)
     {
-        $object_name = get_class($order);
-        if($object_name == 'WC_Order')
+        $redeemed =  get_post_meta( $order->get_id(), '_openpos_wc_points_logged_redemption',true);
+        $is_redeemed =  get_post_meta( $order->get_id(), '_op_wc_points_redeemed',true);
+        if($redeemed && isset($redeemed['amount']) && !$is_redeemed)
         {
-            $redeemed =  get_post_meta( $order->get_id(), '_openpos_wc_points_logged_redemption',true);
-            $is_redeemed =  get_post_meta( $order->get_id(), '_op_wc_points_redeemed',true);
-            if($redeemed && isset($redeemed['amount']) && !$is_redeemed)
-            {
-                $points_earned += WC_Points_Rewards_Manager::calculate_points( $redeemed['amount'] );
-                update_post_meta( $order->get_id(), '_op_wc_points_redeemed',1 );
-            }
+            $points_earned += WC_Points_Rewards_Manager::calculate_points( $redeemed['amount'] );
+            update_post_meta( $order->get_id(), '_op_wc_points_redeemed',1 );
         }
     }
-    
-
     return $points_earned;
 }
 add_action('wc_points_rewards_points_earned_for_purchase', 'op_wc_points_rewards_points_earned_for_purchase',10,2);
