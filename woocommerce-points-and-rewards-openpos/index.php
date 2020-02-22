@@ -5,7 +5,7 @@ Plugin URI: http://openswatch.com
 Description: WooCommerce Points and Rewards For OpenPOS
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.3
+Version: 1.4
 WC requires at least: 2.6
 Text Domain: openpos-dev
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -80,10 +80,22 @@ function op_wc_points_rewards_points_earned_for_purchase($points_earned, $order)
     if($op_session_data)
     {
         $redeemed =  get_post_meta( $order->get_id(), '_openpos_wc_points_logged_redemption',true);
+        $_op_order =  get_post_meta( $order->get_id(), '_op_order',true);
         $is_redeemed =  get_post_meta( $order->get_id(), '_op_wc_points_redeemed',true);
-        if($redeemed && isset($redeemed['amount']) && !$is_redeemed)
+        if($_op_order  && !$is_redeemed)
         {
-            $points_earned += WC_Points_Rewards_Manager::calculate_points( $redeemed['amount'] );
+            $payment_methods = isset($_op_order['payment_method']) ? $_op_order['payment_method'] : array();
+            $paid_total = 0;
+            if(is_array($payment_methods))
+            {
+                foreach($payment_methods as $method)
+                {
+                    $paid = isset($method['paid']) ? $method['paid'] : 0;
+                    $return = isset($method['return']) ? $method['return'] : 0;
+                    $paid_total += ($paid - $return);
+                }
+            }
+            $points_earned = WC_Points_Rewards_Manager::calculate_points( $paid_total  );
             update_post_meta( $order->get_id(), '_op_wc_points_redeemed',1 );
         }
     }
