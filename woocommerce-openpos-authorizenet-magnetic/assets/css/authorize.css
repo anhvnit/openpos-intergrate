@@ -1,0 +1,158 @@
+#paypal-loading{
+    position: absolute;
+    top:0;
+    left:0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 9999;
+}
+#paypal-processing{
+    display: none;
+}
+.processing #paypal-plain-card-info-form{
+    position: relative;
+}
+.processing #paypal-plain-card-info-form #paypal-processing{
+    display: block;
+    z-index: 999;
+    background: #4CAF50;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    color: #fff;
+}
+#paypal-loading-text{
+    height: 50px;
+    width: 100%;
+    top: calc(50% - 250px);
+    text-align: center;
+    position: absolute;
+    z-index: 999999;
+    font-size: 30px;
+    color: green;
+    font-weight: bold;
+}
+#paypal-charge-btn,
+#paypal-close-loading-btn{
+    text-decoration: none;
+    color: #fff;
+    
+    padding: 10px 20px;
+   
+    border-radius: 10px;
+}
+#paypal-close-loading-btn{
+    background: red;
+    border: solid 1px red;
+}
+#paypal-charge-btn{
+    background: green;
+    border: solid 1px green;
+    margin-left: 10px;
+    display: none;
+}
+.charge-hide-btn{
+    display: none;
+}
+
+.swipe-input-container{
+    width: 400px;
+    height: 100px;
+    position: relative;
+    margin: 0 auto;
+}
+.swipe-guide{
+   
+    top: 30px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+.swipe-input-container input{
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    left: 0;
+    right: 0;
+    bottom:0;
+    top:0;
+    position: absolute;
+    border: solid 1px transparent;
+    background-color: transparent;
+    color: transparent;
+    text-indent: -9999px;
+}
+.swipe-input-container input:focus{
+    background-color: green;
+    color: green;
+    cursor:none;
+   
+}
+
+#paypal-plain-card-info-form{
+    background: #ccc;
+    width: 400px;
+    margin: 0 auto;
+    padding: 10px;
+}
+#paypal-plain-card-info-form label{
+    font-size: 12px;
+    text-transform: uppercase;
+    width: 100px;
+    display: inline-block;
+    text-align: right;
+    padding-right: 10px;
+
+}
+#paypal-plain-card-info .exp-detail,
+#paypal-plain-card-info input{
+    /* width: calc(100% - 100px); */
+}
+.exp-detail{
+    display: inline-block;
+    font-size: 12px;
+    color: #000;
+}
+#paypal-plain-card-info input{
+    border : solid 1px #eee;
+    padding: 5px;
+    border-radius: 0;
+}
+#cc-action-change label{
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+}
+#cc-action{
+    font-size: 12px;
+    margin-top: 10px;
+}
+#cc-action input{
+    text-decoration: none;
+   
+    padding: 11px 20px;
+    border-radius: 10px;
+    
+    border: solid 1px #fff;
+    margin-right: 15px;
+    font-weight: bold;
+}
+#pay-now-btn{
+    background: green;
+    color: #fff;
+}
+#cc-action input[type="submit"]:disabled{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+#paypal-message{
+    color: red;
+    font-size: 12px;
+    font-weight: normal;
+    text-align: center;
+}
