@@ -5,7 +5,7 @@ Plugin URI: http://openswatch.com
 Description: Display Product Info App
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.0
+Version: 1.1
 WC requires at least: 2.6
 Text Domain: openpos-product-info
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -68,6 +68,10 @@ function op_product_view_search(){
                             <div class="col-md-8 col-sm-8">
                                 <h4><?php echo $product['name'];?></h4>
                                 <div class="product-info-details">
+                                <dl class="dl-horizontal">
+                                    <dt>Price</dt>
+                                    <dd><?php echo $_product->get_price_html(); ?></dd>
+                                </dl>
                                 <dl class="dl-horizontal">
                                     <dt>Barcode</dt>
                                     <dd><?php echo $_product->get_sku(); ?></dd>

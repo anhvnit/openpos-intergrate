@@ -39,6 +39,7 @@
             data: {action:'op_custom_product_view_search',keyword: $('#input_keyword').val() },
             dataType: 'html',
             success: function(response){
+                $('#input_keyword').select();
                 $('.search-result').html(response);
             }
         });
