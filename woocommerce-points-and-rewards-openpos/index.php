@@ -20,12 +20,27 @@ if(!function_exists('op_wc_points_rewards_user_data'))
         // Show balance
         $points_balance = WC_Points_Rewards_Manager::get_users_points( $customer_id );
         $max_discount = get_option( 'wc_points_rewards_cart_max_discount' );
-        list( $points, $monetary_value ) = explode( ':', get_option( 'wc_points_rewards_redeem_points_ratio', '' ) );
+        $wc_points_rewards_redeem_points_ratio = get_option( 'wc_points_rewards_redeem_points_ratio', '' );
+        $user_data['point_rate'] = 1;
+        
+        if($wc_points_rewards_redeem_points_ratio && strlen($wc_points_rewards_redeem_points_ratio) > 1)
+        {
+            list( $points, $monetary_value ) = explode( ':',  $wc_points_rewards_redeem_points_ratio);
+            $points         = floatval( $points );
+            $monetary_value = floatval( $monetary_value );
+            $user_data['point_rate'] = ( $points / $monetary_value );
+        }
+        
+        
         $ubalance = $points_balance;
         $user_data['point'] = $ubalance;
         $user_data['balance'] = $points_balance;
-        $user_data['point_rate'] = ( $points / $monetary_value );
+        
+       
+        
         $user_data['point_setting'] = array();
+        
+        
         return $user_data;
     }
 }
