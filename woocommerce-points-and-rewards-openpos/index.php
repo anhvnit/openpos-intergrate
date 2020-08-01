@@ -26,6 +26,10 @@ if(!function_exists('op_wc_points_rewards_user_data'))
         if($wc_points_rewards_redeem_points_ratio && strlen($wc_points_rewards_redeem_points_ratio) > 1)
         {
             list( $points, $monetary_value ) = explode( ':',  $wc_points_rewards_redeem_points_ratio);
+            if(!$monetary_value)
+            {
+                $monetary_value = 1;
+            }
             $points         = floatval( $points );
             $monetary_value = floatval( $monetary_value );
             $user_data['point_rate'] = ( $points / $monetary_value );
