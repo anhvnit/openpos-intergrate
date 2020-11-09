@@ -12,7 +12,7 @@ License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2
 */
 
 //define('OPENPOS_PHYSICAL_OUTLET_ID',plugin_dir_path(__FILE__));
-define('OPENPOS_PHYSICAL_OUTLET_ID','5896');
+define('OPENPOS_PHYSICAL_OUTLET_ID','5896'); // change 5896 to your deault outlet id at here
 
 //woocommerce_product_is_in_stock
 function custom_pos_woocommerce_product_is_in_stock($status,$product){
