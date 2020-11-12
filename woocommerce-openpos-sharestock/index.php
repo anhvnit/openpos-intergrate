@@ -5,14 +5,14 @@ Plugin URI: http://openswatch.com
 Description: Woocommerce - Openpos -  Share stock outlet with online
 Author: anhvnit@gmail.com
 Author URI: http://openswatch.com/
-Version: 1.2
+Version: 1.3
 WC requires at least: 2.6
 Text Domain: woocommerce-openpos-sharestock
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 
 //define('OPENPOS_PHYSICAL_OUTLET_ID',plugin_dir_path(__FILE__));
-define('OPENPOS_PHYSICAL_OUTLET_ID','5896'); // change 5896 to your deault outlet id at here
+define('OPENPOS_PHYSICAL_OUTLET_ID','5896');
 
 //woocommerce_product_is_in_stock
 function custom_pos_woocommerce_product_is_in_stock($status,$product){
@@ -22,7 +22,16 @@ function custom_pos_woocommerce_product_is_in_stock($status,$product){
         {
             $_product_id = $product->get_id();
             
-            $qty = $op_warehouse->get_qty(OPENPOS_PHYSICAL_OUTLET_ID,$_product_id);
+            $warehouses = $op_warehouse->warehouses();
+            $qty = 0;
+            foreach($warehouses as $w)
+            {
+                if($w['id'] > 0)
+                {
+                    $qty += 1 * $op_warehouse->get_qty($w['id'],$_product_id);
+                }
+            }
+           
             if($qty > 0)
             {
                 $status = 'instock';
@@ -44,7 +53,17 @@ function custom_pos_woocommerce_stock_amount($qty,$current){
             $product = $current;
             $_product_id = $product->get_id();
             
-            $outlet_qty = $op_warehouse->get_qty(OPENPOS_PHYSICAL_OUTLET_ID,$_product_id);
+            $warehouses = $op_warehouse->warehouses();
+            //$qty = 0;
+            foreach($warehouses as $w)
+            {
+                if($w['id'] > 0)
+                {
+                    $qty += 1 * $op_warehouse->get_qty($w['id'],$_product_id);
+                }
+            }
+
+            $outlet_qty = $qty;
            
             if($outlet_qty > 0)
             {
@@ -65,7 +84,19 @@ function custom_pos_woocommerce_product_variation_get_stock_quantity($qty,$curre
         {
             $product = $current;
             $_product_id = $product->get_id();
-            $outlet_qty = $op_warehouse->get_qty(OPENPOS_PHYSICAL_OUTLET_ID,$_product_id);
+            $warehouses = $op_warehouse->warehouses();
+
+            //$qty = 0;
+            foreach($warehouses as $w)
+            {
+                if($w['id'] > 0)
+                {
+                    $qty +=  1 * $op_warehouse->get_qty($w['id'],$_product_id);
+                }
+            }
+
+            $outlet_qty = $qty;
+
             if($outlet_qty > 0)
             {
                 $qty = $outlet_qty;
@@ -87,24 +118,82 @@ function custom_pos_woocommerce_order_item_quantity($qty,$order, $item){
             $product = wc_get_product( $product );
         }
         $op_in_op_stock_plugin = true;
-       
-        if($product && $product->managing_stock())
+        $item_stock_reduced = $item->get_meta( '_op_reduced_physical_stock', true );
+        if($product && $product->managing_stock() && !$item_stock_reduced )
         {
                 $_product_id = $product->get_id();
-                $physic_qty = $op_warehouse->get_qty(OPENPOS_PHYSICAL_OUTLET_ID,$_product_id);
+                
                 $product_qty = $product->get_stock_quantity();
                 if($qty > $product_qty)
                 {
                     $physic_qty_reduct = 1 * ($qty - $product_qty);
-                    if($physic_qty >= $physic_qty_reduct)
+                    
+                    $qty = $product_qty;
+                    //reduct physical qty;
+                    $warehouses = $op_warehouse->warehouses();
+                    $is_full = false;
+                    $notes = array();
+                    foreach($warehouses as $w)
                     {
-                        $qty = $product_qty;
-                        //reduct physical qty;
-                        $op_warehouse->set_qty(OPENPOS_PHYSICAL_OUTLET_ID,$_product_id,($physic_qty - $physic_qty_reduct));
-                        $item->add_meta_data( '_op_reduced_physical_stock', $physic_qty_reduct, true );
-                        $item->save();
+                        
+                        $w_qty =  1 * $op_warehouse->get_qty($w['id'],$_product_id);
+                        
+
+
+                        if($w_qty >= $physic_qty_reduct && !$item_stock_reduced)
+                        {
+                            $is_full = true;
+                            
+
+                            $op_warehouse->set_qty($w['id'],$_product_id,($w_qty - $physic_qty_reduct));
+                            $item->add_meta_data( '_op_reduced_physical_stock', $physic_qty_reduct, true );
+                            $item->save();
+                            $notes[] =  $w['name'].' - '.__( 'Stock levels reduced : ' , 'woocommerce' ).$physic_qty_reduct;
+                            break;
+                        }
+                        
+                        
+                    }
+                    //partial reduct
+                    if(!$is_full)
+                    {
+                        foreach($warehouses as $w)
+                        {
+                            
+                            $w_qty =  1 * $op_warehouse->get_qty($w['id'],$_product_id);
+                            $item_stock_reduced = $item->get_meta( '_op_reduced_physical_stock', true );
+                            if(!$item_stock_reduced)
+                            {
+                                if($physic_qty_reduct)
+                                {
+                                    
+                                    if($w_qty >= $physic_qty_reduct)
+                                    {
+                                        $op_warehouse->set_qty($w['id'],$_product_id,($w_qty - $physic_qty_reduct));
+                                        $item->add_meta_data('_op_reduced_physical_stock', $physic_qty_reduct, true );
+                                        $item->save();
+                                        $notes[] =  $w['name'].' '.__( 'Stock levels reduced :' , 'woocommerce' ).($w_qty - $physic_qty_reduct);
+                                        break;
+                                    }else{
+                                        $op_warehouse->set_qty($w['id'],$_product_id,0);
+                                        $item->add_meta_data( '_op_reduced_physical_stock', $w_qty , true );
+                                        $item->save();
+                                        $notes[] =  $w['name'].' '.__( 'Stock levels reduced :' , 'woocommerce' ).$w_qty ;
+                                        $physic_qty_reduct -= $w_qty;
+                                    }
+                                    
+                                    
+                                }
+                            }
+                            
+                        }
+                    }
+                    foreach($notes as $n)
+                    {
+                        $order->add_order_note($n);
                     }
                 }
+                
         }
        
     }
